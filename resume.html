@@ -3,57 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resume — BeamSheet</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<title>grtrich - Resume</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="app">
+  <nav>
+    <a href="index.html" class="brand">grtrich</a>
+    <a href="calculator.html">beam calculator</a>
+    <a href="resume.html">resume</a>
+    <a href="portfolio.html">portfolio</a>
+  </nav>
 
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M2 18 L22 18 M4 18 L4 6 L20 6 L20 18" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><circle cx="9" cy="12" r="1.4" fill="currentColor"/><circle cx="15" cy="12" r="1.4" fill="currentColor"/></svg>
-      </div>
-      <div>
-        <h1>Beam<span>Sheet</span></h1>
-        <p class="brand-sub">Shear &amp; Moment Diagram Tool</p>
-      </div>
-    </div>
-
-    <nav class="tabs" aria-label="Site pages">
-      <a href="index.html" class="tab">Calculator</a>
-      <a href="resume.html" class="tab active">Resume</a>
-    </nav>
-
-    <section class="panel">
-      <h2><span class="step">&#9993;</span>About this page</h2>
-      <p class="hint" style="margin-top:0">
-        This tab displays <code>resume.pdf</code> directly — upload your own
-        PDF with that exact filename to the repo root and it appears here
-        automatically, with no other changes needed.
-      </p>
-    </section>
-  </aside>
-
-  <main class="workspace">
-    <div class="sheet">
-      <div class="sheet-head">
-        <h3>Resume</h3>
-        <a href="resume.pdf" download class="btn-download">&darr; Download PDF</a>
-      </div>
-      <iframe src="resume.pdf" class="pdf-frame" title="Resume PDF">
-        <p class="reactions-out">
-          Your browser can't preview PDFs inline.
-          <a href="resume.pdf">Download the PDF directly</a>.
-        </p>
-      </iframe>
-    </div>
-
-    <footer class="workspace-footer">BeamSheet — static, client-side beam analysis.</footer>
+  <main>
+    <p>Upload a <code>resume.pdf</code> to the root to view it here.</p>
+    <iframe src="resume.pdf" class="pdf-frame" title="Resume PDF">
+      <p>Your browser can't preview PDFs inline. <a href="resume.pdf">Download the PDF directly</a>.</p>
+    </iframe>
   </main>
-</div>
 </body>
 </html>

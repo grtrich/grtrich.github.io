@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beam Calculator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="brand">grtrich</a>
+    <a href="calculator.html">beam calculator</a>
+    <a href="resume.html">resume</a>
+    <a href="portfolio.html">portfolio</a>
+  </nav>
+
+  <div class="app">
+    <aside>
+      <form id="beamForm" autocomplete="off">
+        <section class="panel">
+          <h2>Beam & Units</h2>
+          <label>Span length
+            <div class="row">
+              <input type="number" id="beamLength" value="20" min="0.1" step="0.1" required>
+              <input type="text" id="lengthUnit" value="ft" class="unit-input" maxlength="4">
+            </div>
+          </label>
+          <label>Force unit
+            <input type="text" id="forceUnit" value="lb" class="unit-input" maxlength="4">
+          </label>
+        </section>
+
+        <section class="panel">
+          <h2>Supports</h2>
+          <div class="toggle-group" id="supportTypeToggle">
+            <button type="button" class="toggle-btn active" data-value="simple">Simply supported</button>
+            <button type="button" class="toggle-btn" data-value="cantilever">Cantilever</button>
+          </div>
+
+          <div id="simpleSupportFields" class="sub-fields">
+            <label>Support A (pin) position <input type="number" id="supportA" value="0" step="0.1"></label>
+            <label>Support B (roller) position <input type="number" id="supportB" value="20" step="0.1"></label>
+          </div>
+
+          <div id="cantileverFields" class="sub-fields hidden">
+            <label>Fixed end
+              <select id="fixedEnd">
+                <option value="left">Left (x = 0)</option>
+                <option value="right">Right (x = L)</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Loads</h2>
+          <label>Load type
+            <select id="loadType">
+              <option value="point">Point load</option>
+              <option value="udl">Distributed load (UDL)</option>
+              <option value="moment">Applied moment</option>
+            </select>
+          </label>
+
+          <div id="pointFields" class="load-fields">
+            <label>Position <input type="number" id="pPos" value="10" step="0.1"></label>
+            <label>Magnitude (&darr; positive) <input type="number" id="pMag" value="100" step="1"></label>
+          </div>
+          <div id="udlFields" class="load-fields hidden">
+            <label>Start <input type="number" id="uStart" value="0" step="0.1"></label>
+            <label>End <input type="number" id="uEnd" value="20" step="0.1"></label>
+            <label>Intensity <input type="number" id="uMag" value="20" step="1"></label>
+          </div>
+          <div id="momentFields" class="load-fields hidden">
+            <label>Position <input type="number" id="mPos" value="10" step="0.1"></label>
+            <label>Magnitude <input type="number" id="mMag" value="200" step="1"></label>
+            <label>Direction
+              <select id="mDir">
+                <option value="cw">Clockwise</option>
+                <option value="ccw">Counterclockwise</option>
+              </select>
+            </label>
+          </div>
+
+          <button type="button" id="addLoadBtn">+ Add load</button>
+          <ul id="loadList" class="load-list"></ul>
+        </section>
+        
+        <button type="submit" id="calcBtn">Calculate</button>
+      </form>
+    </aside>
+
+    <main class="workspace">
+      <div class="sheet">
+        <div class="sheet-head">Reactions</div>
+        <div id="reactionsOut">Set up your beam and click Calculate.</div>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head">Beam diagram</div>
+        <svg id="beamSvg" viewBox="0 0 900 240"></svg>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head">Free body diagram</div>
+        <svg id="fbdSvg" viewBox="0 0 900 240"></svg>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head">Shear force diagram</div>
+        <svg id="sfdSvg" viewBox="0 0 900 260"></svg>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head">Bending moment diagram</div>
+        <svg id="bmdSvg" viewBox="0 0 900 260"></svg>
+      </div>
+    </main>
+  </div>
+<script src="app.js"></script>
+</body>
+</html>
