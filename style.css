@@ -1,74 +1,186 @@
+/* Base & Typography */
 body {
-  font-family: sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   background-color: #ffffff;
-  color: #000000;
-  margin: 40px auto;
-  max-width: 900px;
+  color: #1a1a1a;
+  margin: 0 auto;
+  max-width: 1000px;
   line-height: 1.6;
-  padding: 0 20px;
+  padding: 40px 20px;
 }
 
+h1, h2, h3 {
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+p {
+  margin-bottom: 1.5em;
+  max-width: 70ch;
+}
+
+/* Navigation */
 nav {
-  margin-bottom: 40px;
+  margin-bottom: 50px;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 20px;
 }
 
 nav a {
-  margin-right: 20px;
+  margin-right: 25px;
   text-decoration: none;
-  color: #0000ee;
+  color: #555555;
+  transition: color 0.2s;
 }
 
 nav a:hover {
-  text-decoration: underline;
+  color: #000000;
 }
 
 nav a.brand {
-  font-weight: bold;
+  font-weight: 700;
   color: #000000;
-  font-size: 1.5em;
+  font-size: 1.2em;
   margin-right: 40px;
 }
 
-.hidden { 
-  display: none; 
+/* Utilities */
+.hidden { display: none !important; }
+code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+
+/* Calculator Layout */
+.app {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
 }
 
-/* Form & App Styling */
-.app { display: flex; flex-direction: column; gap: 40px; }
-.panel { margin-bottom: 20px; }
-.panel h2 { font-size: 1.2em; margin-bottom: 10px; }
-
-label { display: block; margin-bottom: 10px; font-size: 0.9em; }
-input, select, button { 
-  margin-top: 5px; 
-  padding: 5px; 
-  font-family: monospace; 
+@media(min-width: 800px) {
+  .app {
+    grid-template-columns: 320px 1fr;
+  }
 }
+
+.panel {
+  background: #fdfdfd;
+  border: 1px solid #eaeaea;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+}
+
+.panel h2 {
+  font-size: 1.1em;
+  margin-top: 0;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+/* Forms */
+label {
+  display: block;
+  margin-bottom: 15px;
+  font-size: 0.95em;
+  font-weight: 500;
+}
+
+input, select, button {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px 12px;
+  font-family: inherit;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+}
+
 .row { display: flex; gap: 10px; }
-.unit-input { width: 60px; }
+.unit-input { width: 80px; }
 
-.toggle-group { margin-bottom: 15px; }
-.toggle-btn { cursor: pointer; }
-.toggle-btn.active { font-weight: bold; }
+/* Buttons */
+button {
+  cursor: pointer;
+  background: #f9f9f9;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+button:hover { background: #f0f0f0; }
 
-.load-list { list-style: none; padding: 0; }
-.load-list li { 
-  margin-bottom: 5px; 
-  padding: 10px; 
-  border: 1px solid #ccc; 
-  display: flex; 
-  justify-content: space-between; 
+.toggle-group { display: flex; gap: 10px; margin-bottom: 15px; }
+.toggle-btn { flex: 1; margin: 0; color: #555; }
+.toggle-btn.active {
+  font-weight: bold;
+  border-color: #1a1a1a;
+  color: #1a1a1a;
+  background: #f4f4f4;
 }
 
-/* Workspaces and SVGs */
-svg { 
-  border: 1px solid #eee; 
-  margin-bottom: 30px; 
-  background: #fff; 
-  display: block; 
-  width: 100%; 
-  height: auto; 
+/* Load List */
+.load-list { list-style: none; padding: 0; margin-top: 20px; }
+.load-list li {
+  margin-bottom: 8px;
+  padding: 10px 15px;
+  border: 1px solid #eaeaea;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 4px;
+  font-size: 0.9em;
 }
-.sheet-head { margin-bottom: 10px; font-weight: bold; }
-.reactions-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px;}
-.pdf-frame { width: 100%; height: 80vh; min-height: 520px; border: 1px solid #ccc; }
+.load-list button {
+  width: auto;
+  padding: 4px 10px;
+  margin: 0;
+  background: transparent;
+  border: 1px solid #d1d1d1;
+  color: #888;
+}
+.load-list button:hover {
+  background: #fff0f0;
+  color: #cc0000;
+  border-color: #cc0000;
+}
+
+/* Workspaces */
+.workspace { display: flex; flex-direction: column; gap: 40px; }
+.sheet-head {
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+  color: #555;
+}
+
+svg {
+  border: 1px solid #eaeaea;
+  background: #ffffff;
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+svg text {
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.reactions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.reactions-grid div {
+  padding: 15px;
+  background: #fdfdfd;
+  border: 1px solid #eaeaea;
+  border-radius: 6px;
+  font-size: 0.95em;
+}
+
+.pdf-frame {
+  width: 100%;
+  height: 80vh;
+  min-height: 600px;
+  border: 1px solid #eaeaea;
+  border-radius: 6px;
+}

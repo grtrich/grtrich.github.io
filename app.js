@@ -30,7 +30,6 @@
   const cantileverFields = el("cantileverFields");
   const reactionsOut = el("reactionsOut");
 
-  // Update units instantly without hitting calculate
   el("forceUnit").addEventListener("input", (e) => {
     state.forceUnit = e.target.value;
     renderLoadList();
@@ -240,14 +239,6 @@
     return { xs, Vs, Ms };
   }
 
-  function extremum(arr, xs, mode) {
-    let idx = 0;
-    for (let i = 1; i < arr.length; i++) {
-      if (mode === "max" ? arr[i] > arr[idx] : arr[i] < arr[idx]) idx = i;
-    }
-    return { x: xs[idx], v: arr[idx] };
-  }
-
   function calculate() {
     state.length = parseFloat(el("beamLength").value) || 0;
     const L = state.length;
@@ -256,7 +247,6 @@
       return;
     }
     
-    // Support type positions grabbed dynamically prior to run
     if (state.supportType === "simple") {
       state.supportA = clamp(parseFloat(el("supportA").value), 0, state.length);
       state.supportB = clamp(parseFloat(el("supportB").value), 0, state.length);
@@ -276,8 +266,8 @@
     renderReactions(reactions);
     drawBeamDiagram(el("beamSvg"), L, state.loads, reactions, false);
     drawBeamDiagram(el("fbdSvg"), L, state.loads, reactions, true);
-    drawChart(el("sfdSvg"), diagram.xs, diagram.Vs, { color: "#000", unit: state.forceUnit, title: "V" });
-    drawChart(el("bmdSvg"), diagram.xs, diagram.Ms, { color: "#000", unit: `${state.forceUnit}·${state.lengthUnit}`, title: "M" });
+    drawChart(el("sfdSvg"), diagram.xs, diagram.Vs, { color: "#000", unit: state.forceUnit, title: "Shear Force (V)" });
+    drawChart(el("bmdSvg"), diagram.xs, diagram.Ms, { color: "#000", unit: `${state.forceUnit}·${state.lengthUnit}`, title: "Bending Moment (M)" });
   }
 
   function renderReactions(reactions) {
@@ -291,6 +281,13 @@
     const n = document.createElementNS(SVGNS, tag);
     for (const k in attrs) n.setAttribute(k, attrs[k]);
     return n;
+  }
+  
+  function svgText(g, x, y, text, attrs = {}) {
+    const t = svgEl("text", { x, y, fill: "#000", ...attrs });
+    t.textContent = text;
+    g.appendChild(t);
+    return t;
   }
 
   function ensureDefs(svg) {
@@ -308,16 +305,34 @@
     return defs;
   }
 
-  const MX = 60, MR = 40;
+  function drawCoordinateSystem(g, x, y) {
+    g.appendChild(svgEl("line", { x1: x, y1: y, x2: x + 40, y2: y, stroke: "#000", "marker-end": "url(#arr_black)" }));
+    svgText(g, x + 45, y + 4, "x");
+    g.appendChild(svgEl("line", { x1: x, y1: y, x2: x, y2: y - 40, stroke: "#000", "marker-end": "url(#arr_black)" }));
+    svgText(g, x - 10, y - 45, "y");
+  }
+
+  const MX = 70, MR = 50;
   function drawBeamDiagram(svg, L, loads, reactions, isFBD) {
     svg.innerHTML = "";
     ensureDefs(svg);
-    const W = 900, H = 240, beamY = 110, plotW = W - MX - MR;
+    const W = 900, H = 280, beamY = 130, plotW = W - MX - MR;
     const sx = (x) => MX + (x / L) * plotW;
     const g = svgEl("g", {});
     svg.appendChild(g);
 
+    // Draw coordinate system (top left)
+    drawCoordinateSystem(g, 20, 50);
+
     g.appendChild(svgEl("rect", { x: MX, y: beamY - 6, width: plotW, height: 12, fill: "#ccc", stroke: "#000" }));
+    
+    // Support labels offset to clear FBD arrows
+    if (reactions.kind === "simple") {
+      svgText(g, sx(reactions.xA) - 20, beamY + 30, "A", { "text-anchor": "end", "font-weight": "bold" });
+      svgText(g, sx(reactions.xB) + 20, beamY + 30, "B", { "text-anchor": "start", "font-weight": "bold" });
+    } else {
+      svgText(g, sx(reactions.pivot), beamY + 45, "Fixed", { "text-anchor": "middle", "font-weight": "bold" });
+    }
 
     if (!isFBD) {
       if (reactions.kind === "simple") {
@@ -328,10 +343,10 @@
       }
     } else {
       if (reactions.kind === "simple") {
-        drawReactionArrow(g, sx(reactions.xA), beamY, reactions.RA, "Rₐ");
-        drawReactionArrow(g, sx(reactions.xB), beamY, reactions.RB, "R_b");
+        drawReactionArrow(g, sx(reactions.xA), beamY, reactions.RA, "Rₐ = " + fmt(reactions.RA) + " " + state.forceUnit);
+        drawReactionArrow(g, sx(reactions.xB), beamY, reactions.RB, "R_b = " + fmt(reactions.RB) + " " + state.forceUnit);
       } else {
-        drawReactionArrow(g, sx(reactions.pivot), beamY, reactions.R, "R");
+        drawReactionArrow(g, sx(reactions.pivot), beamY, reactions.R, "R = " + fmt(reactions.R) + " " + state.forceUnit);
       }
     }
 
@@ -343,7 +358,7 @@
       } else if (l.type === "udl") {
         drawUDL(g, sx(l.start), sx(l.end), beamY, l.magnitude, markerId, color);
       } else if (l.type === "moment") {
-        drawAppliedMomentArc(g, sx(l.position), beamY, l.direction, markerId, color);
+        drawAppliedMomentArc(g, sx(l.position), beamY, l.direction, markerId, color, l.magnitude);
       }
     });
   }
@@ -361,51 +376,105 @@
 
   function drawPointLoadArrow(g, x, beamY, magnitude, marker, color) {
     const down = magnitude >= 0;
-    const y1 = down ? beamY - 48 : beamY + 48;
+    const y1 = down ? beamY - 60 : beamY + 60;
     const y2 = down ? beamY - 8 : beamY + 8;
     g.appendChild(svgEl("line", { x1: x, y1, x2: x, y2, stroke: color, "stroke-width": 2, "marker-end": marker }));
+    
+    // label
+    const textY = down ? y1 - 10 : y1 + 15;
+    svgText(g, x, textY, fmt(Math.abs(magnitude)) + " " + state.forceUnit, { fill: color, "text-anchor": "middle" });
   }
 
   function drawUDL(g, x1, x2, beamY, magnitude, marker, color) {
     const down = magnitude >= 0;
-    const barY = down ? beamY - 34 : beamY + 34;
+    const barY = down ? beamY - 45 : beamY + 45;
     g.appendChild(svgEl("line", { x1, y1: barY, x2, y2: barY, stroke: color, "stroke-width": 2 }));
     for (let i = 0; i <= 4; i++) {
       const xx = x1 + (i * (x2 - x1)) / 4;
       g.appendChild(svgEl("line", { x1: xx, y1: barY, x2: xx, y2: down ? beamY - 8 : beamY + 8, stroke: color, "stroke-width": 2, "marker-end": marker }));
     }
+    
+    // label
+    const textY = down ? barY - 10 : barY + 20;
+    svgText(g, (x1 + x2) / 2, textY, fmt(Math.abs(magnitude)) + " " + state.forceUnit + "/" + state.lengthUnit, { fill: color, "text-anchor": "middle" });
   }
 
-  function drawReactionArrow(g, x, beamY, value, text) {
+  function drawReactionArrow(g, x, beamY, value, textStr) {
     const up = value >= 0;
-    const y1 = up ? beamY + 48 : beamY - 48;
+    const y1 = up ? beamY + 60 : beamY - 60;
     const y2 = up ? beamY + 8 : beamY - 8;
     g.appendChild(svgEl("line", { x1: x, y1, x2: x, y2, stroke: "#000", "stroke-width": 2, "marker-end": "url(#arr_black)" }));
+    
+    const textY = up ? y1 + 15 : y1 - 10;
+    svgText(g, x, textY, textStr, { fill: "#000", "text-anchor": "middle" });
   }
 
-  function drawAppliedMomentArc(g, x, beamY, direction, marker, color) {
-    const r = 20, y = beamY - 46, sweep = direction === "cw" ? 1 : 0;
+  function drawAppliedMomentArc(g, x, beamY, direction, marker, color, magnitude) {
+    const r = 25, y = beamY - 60, sweep = direction === "cw" ? 1 : 0;
     g.appendChild(svgEl("path", { d: `M ${x - r} ${y} A ${r} ${r} 0 1 ${sweep} ${x + r} ${y}`, fill: "none", stroke: color, "stroke-width": 2, "marker-end": marker }));
+    svgText(g, x, y - 30, fmt(Math.abs(magnitude)) + " " + state.forceUnit + "·" + state.lengthUnit, { fill: color, "text-anchor": "middle" });
+  }
+  
+  function getNiceTicks(min, max, targetTicks) {
+    const range = max - min;
+    if (range === 0) return { step: 1, min: min - 1, max: max + 1 };
+    
+    const mag = Math.pow(10, Math.floor(Math.log10(range)));
+    const norm = range / mag; 
+    let step;
+    if (norm < 1.5) step = 0.2;
+    else if (norm < 3) step = 0.5;
+    else if (norm < 7) step = 1;
+    else step = 2;
+    
+    step *= mag;
+    const tickMin = Math.floor(min / step) * step;
+    const tickMax = Math.ceil(max / step) * step;
+    return { step, min: tickMin, max: tickMax };
   }
 
   function drawChart(svg, xs, ys, opts) {
     svg.innerHTML = "";
-    const W = 900, H = 260, marginL = 64, marginR = 30, marginT = 20, marginB = 34;
+    const W = 900, H = 320, marginL = 80, marginR = 40, marginT = 40, marginB = 50;
     const plotW = W - marginL - marginR, plotH = H - marginT - marginB;
     const xMin = xs[0], xMax = xs[xs.length - 1];
-    let yMax = Math.max(...ys, 0), yMin = Math.min(...ys, 0);
-    if (yMax - yMin < 1e-6) { yMax += 1; yMin -= 1; }
+    
+    let rawYMax = Math.max(...ys, 0), rawYMin = Math.min(...ys, 0);
+    if (rawYMax - rawYMin < 1e-6) { rawYMax += 1; rawYMin -= 1; }
+    
+    const yTicks = getNiceTicks(rawYMin, rawYMax, 5);
+    const yMin = yTicks.min;
+    const yMax = yTicks.max;
     const yRange = yMax - yMin;
+    
     const sx = (x) => marginL + ((x - xMin) / (xMax - xMin || 1)) * plotW;
     const sy = (y) => marginT + plotH - ((y - yMin) / yRange) * plotH;
 
     const g = svgEl("g", {});
     svg.appendChild(g);
-    g.appendChild(svgEl("line", { x1: marginL, y1: sy(0), x2: W - marginR, y2: sy(0), stroke: "#ccc", "stroke-width": 1 }));
+    
+    for (let y = yMin; y <= yMax + 1e-9; y += yTicks.step) {
+      const yy = sy(y);
+      g.appendChild(svgEl("line", { x1: marginL, y1: yy, x2: W - marginR, y2: yy, stroke: "#eee", "stroke-width": 1 }));
+      svgText(g, marginL - 10, yy + 4, fmt(y), { "text-anchor": "end", fill: "#555" });
+    }
+    
+    const xStepTicks = getNiceTicks(xMin, xMax, 10);
+    for (let x = Math.max(xMin, xStepTicks.min); x <= xMax; x += xStepTicks.step) {
+       const xx = sx(x);
+       g.appendChild(svgEl("line", { x1: xx, y1: marginT, x2: xx, y2: marginT + plotH, stroke: "#eee", "stroke-width": 1 }));
+       svgText(g, xx, marginT + plotH + 20, fmt(x), { "text-anchor": "middle", fill: "#555" });
+    }
+
+    g.appendChild(svgEl("line", { x1: marginL, y1: sy(0), x2: W - marginR, y2: sy(0), stroke: "#888", "stroke-width": 1.5 }));
+    
+    svgText(g, marginL - 60, marginT - 15, `${opts.title} (${opts.unit})`, { "font-weight": "bold" });
+    svgText(g, W - marginR + 10, sy(0) - 10, `x (${state.lengthUnit})`, { "font-style": "italic", fill: "#555" });
 
     let linePath = `M ${sx(xs[0])} ${sy(ys[0])}`;
     for (let i = 1; i < xs.length; i++) linePath += ` L ${sx(xs[i])} ${sy(ys[i])}`;
     g.appendChild(svgEl("path", { d: linePath, fill: "none", stroke: opts.color, "stroke-width": 2 }));
+    
     g.appendChild(svgEl("rect", { x: marginL, y: marginT, width: plotW, height: plotH, fill: "none", stroke: "#000" }));
   }
 
