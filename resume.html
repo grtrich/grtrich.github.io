@@ -1,21 +1,94 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Garrett Richards, ME '27</title>
-<style>
-body{
-    font-family: Consolas, monospace;
-    white-space: pre-wrap;
-    margin:20px;
-}
-</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume — BeamSheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-Garrett Richards - Looking for Full Time Roles
-    Garrett.Richards@mines.sdsmt.edu
-Mechanical Engineering Student - May 2027
-South Dakota School of Mines & Technology
-Baja SAE - Senior Design, Design Lead, Suspension Lead, Vice President
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M2 18 L22 18 M4 18 L4 6 L20 6 L20 18" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><circle cx="9" cy="12" r="1.4" fill="currentColor"/><circle cx="15" cy="12" r="1.4" fill="currentColor"/></svg>
+      </div>
+      <div>
+        <h1>Beam<span>Sheet</span></h1>
+        <p class="brand-sub">Shear &amp; Moment Diagram Tool</p>
+      </div>
+    </div>
+
+    <nav class="tabs" aria-label="Site pages">
+      <a href="index.html" class="tab">Calculator</a>
+      <a href="resume.html" class="tab active">Resume</a>
+    </nav>
+
+    <section class="panel">
+      <h2><span class="step">&#9993;</span>Contact</h2>
+      <p class="hint" style="margin-top:0">
+        Your Name<br>
+        you@email.com &middot; (555) 555-5555<br>
+        City, State &middot; linkedin.com/in/you
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2><span class="step">&#9776;</span>Skills</h2>
+      <p class="hint" style="margin-top:0">
+        Replace this list with your own — e.g. structural analysis,
+        AutoCAD/Revit, Python, project management.
+      </p>
+    </section>
+  </aside>
+
+  <main class="workspace">
+    <div class="sheet">
+      <div class="sheet-head">
+        <h3>Resume</h3>
+        <a href="resume.pdf" download class="btn-download">&darr; Download PDF</a>
+      </div>
+      <iframe src="resume.pdf" class="pdf-frame" title="Resume PDF">
+        <p class="reactions-out">
+          Your browser can't preview PDFs inline.
+          <a href="resume.pdf">Download the PDF directly</a>.
+        </p>
+      </iframe>
+    </div>
+
+    <div class="sheet">
+      <div class="sheet-head"><h3>Summary</h3><span class="sheet-tag">Profile</span></div>
+      <div class="reactions-out">
+        One or two sentences on who you are and what you do. Replace this
+        placeholder with your real resume content — or paste the body of
+        your existing resume page in here and keep this file's &lt;head&gt;
+        and nav so it matches the rest of the site.
+      </div>
+    </div>
+
+    <div class="sheet">
+      <div class="sheet-head"><h3>Experience</h3><span class="sheet-tag">Work</span></div>
+      <div class="reactions-out">
+        <strong style="color:var(--ink)">Job Title — Company</strong><br>
+        Month Year &ndash; Month Year<br>
+        Bullet describing an accomplishment, with a number if you have one.
+      </div>
+    </div>
+
+    <div class="sheet">
+      <div class="sheet-head"><h3>Education</h3><span class="sheet-tag">Academic</span></div>
+      <div class="reactions-out">
+        <strong style="color:var(--ink)">Degree — School</strong><br>
+        Graduation year
+      </div>
+    </div>
+
+    <footer class="workspace-footer">Replace the placeholder sections above with your own resume content.</footer>
+  </main>
+</div>
 </body>
 </html>
