@@ -309,7 +309,7 @@
     g.appendChild(svgEl("line", { x1: x, y1: y, x2: x + 40, y2: y, stroke: "#000", "marker-end": "url(#arr_black)" }));
     svgText(g, x + 45, y + 4, "x");
     g.appendChild(svgEl("line", { x1: x, y1: y, x2: x, y2: y - 40, stroke: "#000", "marker-end": "url(#arr_black)" }));
-    svgText(g, x - 10, y - 45, "y");
+    svgText(g, x - 12, y - 42, "y"); 
   }
 
   const MX = 70, MR = 50;
@@ -321,8 +321,8 @@
     const g = svgEl("g", {});
     svg.appendChild(g);
 
-    // Draw coordinate system (top left)
-    drawCoordinateSystem(g, 20, 50);
+    // Draw coordinate system (shifted down to prevent y clipping)
+    drawCoordinateSystem(g, 30, 70);
 
     g.appendChild(svgEl("rect", { x: MX, y: beamY - 6, width: plotW, height: 12, fill: "#ccc", stroke: "#000" }));
     
