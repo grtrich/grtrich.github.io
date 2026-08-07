@@ -3,147 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BeamSheet — Shear &amp; Moment Calculator</title>
-<meta name="description" content="Free, client-side beam analysis tool: reactions, FBD, shear force and bending moment diagrams.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Garrett Richards [ME' 27]</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  .social-row svg {
+    width: 18px;
+    height: 18px;
+    min-width: 18px; 
+    flex-shrink: 0;  
+    fill: #777;
+    border: none;
+    background: transparent;
+    border-radius: 0; 
+    display: inline-block; 
+  }
+</style>
 </head>
 <body>
-<div class="app">
+  <nav>
+    <a href="/" class="brand">Garrett Richards</a>
+    <a href="calculator.html">beam calculator</a>
+    <a href="resume.html">resume</a>
+    <a href="portfolio.html">portfolio</a>
+  </nav>
 
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M2 18 L22 18 M4 18 L4 6 L20 6 L20 18" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><circle cx="9" cy="12" r="1.4" fill="currentColor"/><circle cx="15" cy="12" r="1.4" fill="currentColor"/></svg>
-      </div>
-      <div>
-        <h1>Beam<span>Sheet</span></h1>
-        <p class="brand-sub">Shear &amp; Moment Diagram Tool</p>
-      </div>
-    </div>
+  <main>
+    <h2>Welcome</h2>
+    <p>I'm a senior mechanical engineering student at South Dakota Mines, graduating May 2027. My technical electives include Systems Engineering, Applied FEA & lab, GD&T, and Experimental Stress Analsysis & lab.</p>
+    
+    <p>I've been on the Baja SAE team for four years as vice president, suspension lead, design lead, and senior design member. Currently, I'm working on drivetrain ratio optimization using vehicle dynamics and laptime simulation, as well as mechanical design of the transmission and gearbox.</p>
 
-    <nav class="tabs" aria-label="Site pages">
-      <a href="index.html" class="tab active">Calculator</a>
-      <a href="resume.html" class="tab">Resume</a>
-    </nav>
-
-    <form id="beamForm" autocomplete="off">
-      <section class="panel">
-        <h2><span class="step">01</span>Beam</h2>
-        <label>Span length
-          <div class="row">
-            <input type="number" id="beamLength" value="20" min="0.1" step="0.1" required>
-            <input type="text" id="lengthUnit" value="ft" class="unit-input" maxlength="4" aria-label="Length unit">
-          </div>
-        </label>
-        <label>Force unit
-          <input type="text" id="forceUnit" value="lb" class="unit-input" maxlength="4" aria-label="Force unit">
-        </label>
-      </section>
-
-      <section class="panel">
-        <h2><span class="step">02</span>Supports</h2>
-        <div class="toggle-group" id="supportTypeToggle">
-          <button type="button" class="toggle-btn active" data-value="simple">Simply supported</button>
-          <button type="button" class="toggle-btn" data-value="cantilever">Cantilever</button>
-        </div>
-
-        <div id="simpleSupportFields" class="sub-fields">
-          <label>Support A (pin) position
-            <input type="number" id="supportA" value="0" step="0.1">
-          </label>
-          <label>Support B (roller) position
-            <input type="number" id="supportB" value="20" step="0.1">
-          </label>
-        </div>
-
-        <div id="cantileverFields" class="sub-fields hidden">
-          <label>Fixed end
-            <select id="fixedEnd">
-              <option value="left">Left (x = 0)</option>
-              <option value="right">Right (x = L)</option>
-            </select>
-          </label>
-        </div>
-      </section>
-
-      <section class="panel">
-        <h2><span class="step">03</span>Loads</h2>
-
-        <div class="load-form">
-          <label class="load-type-label">Load type
-            <select id="loadType">
-              <option value="point">Point load</option>
-              <option value="udl">Distributed load (UDL)</option>
-              <option value="moment">Applied moment</option>
-            </select>
-          </label>
-
-          <div id="pointFields" class="load-fields">
-            <label>Position <input type="number" id="pPos" value="10" step="0.1"></label>
-            <label>Magnitude (&darr; positive) <input type="number" id="pMag" value="100" step="1"></label>
-          </div>
-
-          <div id="udlFields" class="load-fields hidden">
-            <label>Start <input type="number" id="uStart" value="0" step="0.1"></label>
-            <label>End <input type="number" id="uEnd" value="20" step="0.1"></label>
-            <label>Intensity (&darr; positive, per length) <input type="number" id="uMag" value="20" step="1"></label>
-          </div>
-
-          <div id="momentFields" class="load-fields hidden">
-            <label>Position <input type="number" id="mPos" value="10" step="0.1"></label>
-            <label>Magnitude <input type="number" id="mMag" value="200" step="1"></label>
-            <label>Direction
-              <select id="mDir">
-                <option value="cw">Clockwise</option>
-                <option value="ccw">Counterclockwise</option>
-              </select>
-            </label>
-          </div>
-
-          <button type="button" id="addLoadBtn" class="btn-add">+ Add load</button>
-        </div>
-
-        <ul id="loadList" class="load-list" aria-live="polite"></ul>
-      </section>
-
-      <button type="submit" id="calcBtn" class="btn-calc">Calculate &rarr;</button>
-      <p class="hint">Point &amp; distributed loads: positive = downward. Bending moment diagram uses the sagging-positive (upward) convention. Everything runs in your browser — nothing is uploaded.</p>
-    </form>
-  </aside>
-
-  <main class="workspace">
-    <div class="sheet" id="reactionsSheet">
-      <div class="sheet-head"><h3>Reactions</h3><span class="sheet-tag">Statics</span></div>
-      <div id="reactionsOut" class="reactions-out">Set up your beam on the left and click Calculate.</div>
-    </div>
-
-    <div class="sheet">
-      <div class="sheet-head"><h3>Beam diagram</h3><span class="sheet-tag">Elevation</span></div>
-      <svg id="beamSvg" viewBox="0 0 900 240" preserveAspectRatio="xMidYMid meet"></svg>
-    </div>
-
-    <div class="sheet">
-      <div class="sheet-head"><h3>Free body diagram</h3><span class="sheet-tag">FBD</span></div>
-      <svg id="fbdSvg" viewBox="0 0 900 240" preserveAspectRatio="xMidYMid meet"></svg>
-    </div>
-
-    <div class="sheet">
-      <div class="sheet-head"><h3>Shear force diagram</h3><span class="sheet-tag">V(x)</span></div>
-      <svg id="sfdSvg" viewBox="0 0 900 260" preserveAspectRatio="xMidYMid meet"></svg>
-    </div>
-
-    <div class="sheet">
-      <div class="sheet-head"><h3>Bending moment diagram</h3><span class="sheet-tag">M(x)</span></div>
-      <svg id="bmdSvg" viewBox="0 0 900 260" preserveAspectRatio="xMidYMid meet"></svg>
-    </div>
-
-    <footer class="workspace-footer">BeamSheet — static, client-side beam analysis. Statically determinate beams only (simply supported or cantilever).</footer>
+    <h3>Site</h3>
+    <p>The beam calculator page currently supports analysis of simply supported and cantilevered beams for point loads, uniform distributed loads, and applied moments.</p>
   </main>
-</div>
 
-<script src="app.js"></script>
+  <footer>
+    <div class="footer-col">
+      <span class="footer-name">Garrett Richards</span>
+      <a href="mailto:Garrett.Richards@mines.sdsmt.edu" class="footer-link">Garrett.Richards@mines.sdsmt.edu</a>
+    </div>
+    <div class="footer-col">
+      <div class="social-row">
+        <svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+        <a href="https://github.com/grtrich" class="footer-link">grtrich</a>
+      </div>
+      <div class="social-row">
+        <svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M3.14 14H.64V5.44h2.5V14zM1.89 4.41A1.45 1.45 0 01.44 2.96 1.45 1.45 0 011.89 1.5a1.45 1.45 0 011.45 1.46 1.45 1.45 0 01-1.45 1.45zm13.47 9.59h-2.5V9.86c0-.99-.02-2.27-1.38-2.27-1.38 0-1.6 1.08-1.6 2.2v4.21H7.38V5.44h2.4v1.17h.03c.34-.63 1.15-1.3 2.37-1.3 2.53 0 3 1.67 3 3.83V14z"></path></svg>
+        <a href="https://www.linkedin.com/in/garrettrichards/" class="footer-link">garrettrichards</a>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

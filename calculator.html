@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beam Calculator - Garrett Richards [ME '27]</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">Garrett Richards</a>
+    <a href="calculator.html">beam calculator</a>
+    <a href="resume.html">resume</a>
+    <a href="portfolio.html">portfolio</a>
+  </nav>
+
+  <div class="app">
+    <aside>
+      <form id="beamForm" autocomplete="off">
+        <section class="panel">
+          <h2>Beam & Units</h2>
+          <label>Span length
+            <div class="row">
+              <input type="number" id="beamLength" value="20" min="0.1" step="0.1" required>
+              <input type="text" id="lengthUnit" value="ft" class="unit-input" maxlength="4">
+            </div>
+          </label>
+          <label>Force unit
+            <input type="text" id="forceUnit" value="lb" class="unit-input" maxlength="4">
+          </label>
+        </section>
+
+        <section class="panel">
+          <h2>Supports</h2>
+          <div class="toggle-group" id="supportTypeToggle">
+            <button type="button" class="toggle-btn active" data-value="simple">Simply supported</button>
+            <button type="button" class="toggle-btn" data-value="cantilever">Cantilever</button>
+          </div>
+
+          <div id="simpleSupportFields" class="sub-fields">
+            <label>Support A (pin) position <input type="number" id="supportA" value="0" step="0.1"></label>
+            <label>Support B (roller) position <input type="number" id="supportB" value="20" step="0.1"></label>
+          </div>
+
+          <div id="cantileverFields" class="sub-fields hidden">
+            <label>Fixed end
+              <select id="fixedEnd">
+                <option value="left">Left (x = 0)</option>
+                <option value="right">Right (x = L)</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Loads</h2>
+          <label>Load type
+            <select id="loadType">
+              <option value="point">Point load</option>
+              <option value="udl">Distributed load (UDL)</option>
+              <option value="moment">Applied moment</option>
+            </select>
+          </label>
+
+          <div id="pointFields" class="load-fields">
+            <label>Position <input type="number" id="pPos" value="10" step="0.1"></label>
+            <label>Magnitude (&darr; positive) <input type="number" id="pMag" value="100" step="1"></label>
+          </div>
+          <div id="udlFields" class="load-fields hidden">
+            <label>Start <input type="number" id="uStart" value="0" step="0.1"></label>
+            <label>End <input type="number" id="uEnd" value="20" step="0.1"></label>
+            <label>Intensity <input type="number" id="uMag" value="20" step="1"></label>
+          </div>
+          <div id="momentFields" class="load-fields hidden">
+            <label>Position <input type="number" id="mPos" value="10" step="0.1"></label>
+            <label>Magnitude <input type="number" id="mMag" value="200" step="1"></label>
+            <label>Direction
+              <select id="mDir">
+                <option value="cw">Clockwise</option>
+                <option value="ccw">Counterclockwise</option>
+              </select>
+            </label>
+          </div>
+
+          <button type="button" id="addLoadBtn">+ Add load</button>
+          <ul id="loadList" class="load-list"></ul>
+        </section>
+        
+        <button type="submit" id="calcBtn">Calculate</button>
+      </form>
+    </aside>
+
+    <main class="workspace">
+      <div class="sheet">
+        <div class="sheet-head">Reactions</div>
+        <div id="reactionsOut">Set up your beam and click Calculate.</div>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head">Beam diagram</div>
+        <svg id="beamSvg" viewBox="0 0 900 280"></svg>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head">Free body diagram</div>
+        <svg id="fbdSvg" viewBox="0 0 900 280"></svg>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head">Shear force diagram</div>
+        <svg id="sfdSvg" viewBox="0 0 900 320"></svg>
+      </div>
+      <div class="sheet">
+        <div class="sheet-head">Bending moment diagram</div>
+        <svg id="bmdSvg" viewBox="0 0 900 320"></svg>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-col">
+      <span class="footer-name">Garrett Richards</span>
+      <a href="mailto:Garrett.Richards@mines.sdsmt.edu" class="footer-link">Garrett.Richards@mines.sdsmt.edu</a>
+    </div>
+    <div class="footer-col">
+      <div class="social-row">
+        <svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+        <a href="https://github.com/grtrich" class="footer-link">grtrich</a>
+      </div>
+      <div class="social-row">
+        <svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M3.14 14H.64V5.44h2.5V14zM1.89 4.41A1.45 1.45 0 01.44 2.96 1.45 1.45 0 011.89 1.5a1.45 1.45 0 011.45 1.46 1.45 1.45 0 01-1.45 1.45zm13.47 9.59h-2.5V9.86c0-.99-.02-2.27-1.38-2.27-1.38 0-1.6 1.08-1.6 2.2v4.21H7.38V5.44h2.4v1.17h.03c.34-.63 1.15-1.3 2.37-1.3 2.53 0 3 1.67 3 3.83V14z"></path></svg>
+        <a href="https://www.linkedin.com/in/garrettrichards/" class="footer-link">garrettrichards</a>
+      </div>
+    </div>
+  </footer>
+
+<script src="app.js"></script>
+</body>
+</html>
