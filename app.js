@@ -218,7 +218,7 @@
     return { forces, moments };
   }
 
-  function computeDiagram(L, forces, moments, N = 480) {
+ function computeDiagram(L, forces, moments, N = 480) {
     const xs = new Array(N + 1), Vs = new Array(N + 1), Ms = new Array(N + 1);
     const EPS = 1e-7;
 
@@ -227,7 +227,10 @@
       let V = 0, M = 0;
       for (let k = 0; k < forces.length; k++) {
         if (forces[k].x <= x + EPS) {
-          V += forces[k].F;
+          // Prevent the final reaction at x = L from dropping V to 0
+          if (forces[k].x < L - EPS) {
+            V += forces[k].F;
+          }
           M += forces[k].F * (x - forces[k].x);
         }
       }
