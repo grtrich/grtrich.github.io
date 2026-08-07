@@ -500,8 +500,8 @@
     g.appendChild(svgEl("rect", { x: marginL, y: marginT, width: plotW, height: plotH, fill: "none", stroke: "#000" }));
   }
 
-  state.loads.push({ id: state.nextId++, type: "point", position: 10, magnitude: 400 });
-  state.loads.push({ id: state.nextId++, type: "udl", start: 0, end: 20, magnitude: 30 });
+  state.loads.push({ id: state.nextId++, type: "point", position: 5, magnitude: 100 });
+  state.loads.push({ id: state.nextId++, type: "udl", start: 10, end: 20, magnitude: 30 });
   renderLoadList();
   calculate();
 })();
