@@ -321,12 +321,25 @@
     const g = svgEl("g", {});
     svg.appendChild(g);
 
-    // Draw coordinate system (shifted down to prevent y clipping)
+    // Track vertical stacking for overlapping labels/arrows
+    const stackTop = {};
+    const stackBot = {};
+    function getStack(x, isDown) {
+        const map = isDown ? stackTop : stackBot;
+        let maxC = 0;
+        for (let k in map) {
+            if (Math.abs(parseFloat(k) - x) < 25) {
+                maxC = Math.max(maxC, map[k]);
+            }
+        }
+        map[x] = maxC + 1;
+        return maxC;
+    }
+
     drawCoordinateSystem(g, 30, 70);
 
     g.appendChild(svgEl("rect", { x: MX, y: beamY - 6, width: plotW, height: 12, fill: "#ccc", stroke: "#000" }));
     
-    // Support labels offset to clear FBD arrows
     if (reactions.kind === "simple") {
       svgText(g, sx(reactions.xA) - 20, beamY + 30, "A", { "text-anchor": "end", "font-weight": "bold" });
       svgText(g, sx(reactions.xB) + 20, beamY + 30, "B", { "text-anchor": "start", "font-weight": "bold" });
@@ -354,11 +367,14 @@
       const color = getLoadColor(l.id);
       const markerId = "url(#arr_" + color.replace("#", "") + ")";
       if (l.type === "point") {
-        drawPointLoadArrow(g, sx(l.position), beamY, l.magnitude, markerId, color);
+        const count = getStack(sx(l.position), l.magnitude >= 0);
+        drawPointLoadArrow(g, sx(l.position), beamY, l.magnitude, markerId, color, count);
       } else if (l.type === "udl") {
-        drawUDL(g, sx(l.start), sx(l.end), beamY, l.magnitude, markerId, color);
+        const count = getStack(sx((l.start + l.end) / 2), l.magnitude >= 0);
+        drawUDL(g, sx(l.start), sx(l.end), beamY, l.magnitude, markerId, color, count);
       } else if (l.type === "moment") {
-        drawAppliedMomentArc(g, sx(l.position), beamY, l.direction, markerId, color, l.magnitude);
+        const count = getStack(sx(l.position), true);
+        drawAppliedMomentArc(g, sx(l.position), beamY, l.direction, markerId, color, l.magnitude, count);
       }
     });
   }
@@ -374,10 +390,11 @@
     g.appendChild(svgEl("line", { x1: x, y1: y - 34, x2: x, y2: y + 34, stroke: "#000", "stroke-width": 4 }));
   }
 
-  function drawPointLoadArrow(g, x, beamY, magnitude, marker, color) {
+  function drawPointLoadArrow(g, x, beamY, magnitude, marker, color, stackCount = 0) {
     const down = magnitude >= 0;
-    const y1 = down ? beamY - 60 : beamY + 60;
-    const y2 = down ? beamY - 8 : beamY + 8;
+    const yOff = stackCount * 45;
+    const y1 = down ? beamY - 60 - yOff : beamY + 60 + yOff;
+    const y2 = down ? beamY - 8 - yOff : beamY + 8 + yOff;
     g.appendChild(svgEl("line", { x1: x, y1, x2: x, y2, stroke: color, "stroke-width": 2, "marker-end": marker }));
     
     // label
@@ -385,9 +402,11 @@
     svgText(g, x, textY, fmt(Math.abs(magnitude)) + " " + state.forceUnit, { fill: color, "text-anchor": "middle" });
   }
 
-  function drawUDL(g, x1, x2, beamY, magnitude, marker, color) {
+  function drawUDL(g, x1, x2, beamY, magnitude, marker, color, stackCount = 0) {
     const down = magnitude >= 0;
     const barY = down ? beamY - 45 : beamY + 45;
+    const yOff = stackCount * 25;
+    
     g.appendChild(svgEl("line", { x1, y1: barY, x2, y2: barY, stroke: color, "stroke-width": 2 }));
     for (let i = 0; i <= 4; i++) {
       const xx = x1 + (i * (x2 - x1)) / 4;
@@ -395,7 +414,7 @@
     }
     
     // label
-    const textY = down ? barY - 10 : barY + 20;
+    const textY = down ? barY - 10 - yOff : barY + 20 + yOff;
     svgText(g, (x1 + x2) / 2, textY, fmt(Math.abs(magnitude)) + " " + state.forceUnit + "/" + state.lengthUnit, { fill: color, "text-anchor": "middle" });
   }
 
@@ -409,8 +428,8 @@
     svgText(g, x, textY, textStr, { fill: "#000", "text-anchor": "middle" });
   }
 
-  function drawAppliedMomentArc(g, x, beamY, direction, marker, color, magnitude) {
-    const r = 25, y = beamY - 60, sweep = direction === "cw" ? 1 : 0;
+  function drawAppliedMomentArc(g, x, beamY, direction, marker, color, magnitude, stackCount = 0) {
+    const r = 25, y = beamY - 60 - (stackCount * 40), sweep = direction === "cw" ? 1 : 0;
     g.appendChild(svgEl("path", { d: `M ${x - r} ${y} A ${r} ${r} 0 1 ${sweep} ${x + r} ${y}`, fill: "none", stroke: color, "stroke-width": 2, "marker-end": marker }));
     svgText(g, x, y - 30, fmt(Math.abs(magnitude)) + " " + state.forceUnit + "·" + state.lengthUnit, { fill: color, "text-anchor": "middle" });
   }
@@ -469,7 +488,9 @@
     g.appendChild(svgEl("line", { x1: marginL, y1: sy(0), x2: W - marginR, y2: sy(0), stroke: "#888", "stroke-width": 1.5 }));
     
     svgText(g, marginL - 60, marginT - 15, `${opts.title} (${opts.unit})`, { "font-weight": "bold" });
-    svgText(g, W - marginR + 10, sy(0) - 10, `x (${state.lengthUnit})`, { "font-style": "italic", fill: "#555" });
+    
+    // Moved length label to the bottom right of the graph to match x-axis ticks
+    svgText(g, W - marginR + 10, marginT + plotH + 20, `x (${state.lengthUnit})`, { "font-style": "italic", fill: "#555" });
 
     let linePath = `M ${sx(xs[0])} ${sy(ys[0])}`;
     for (let i = 1; i < xs.length; i++) linePath += ` L ${sx(xs[i])} ${sy(ys[i])}`;

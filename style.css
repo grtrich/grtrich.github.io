@@ -178,3 +178,41 @@ svg text {
   border: 1px solid #eaeaea;
   border-radius: 6px;
 }
+
+/* Footer */
+footer {
+  margin-top: 50px;
+  border-top: 1px solid #eaeaea;
+  padding-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: 1.05em;
+}
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.footer-name {
+  color: #777;
+}
+.footer-link {
+  color: #0366d6;
+  text-decoration: none;
+}
+.footer-link:hover {
+  text-decoration: underline;
+}
+.social-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.social-row svg {
+  width: 18px;
+  height: 18px;
+  fill: #777;
+  border: none;
+  background: transparent;
+}
