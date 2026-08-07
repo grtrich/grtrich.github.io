@@ -3,7 +3,6 @@
 
   const SVGNS = "http://www.w3.org/2000/svg";
   
-  // Palette for unique load colors
   const loadColors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe'];
 
   const state = {
@@ -200,7 +199,7 @@
       if (l.type === "point") {
         forces.push({ x: l.position, F: -l.magnitude });
       } else if (l.type === "udl") {
-        const n = 240;
+        const n = 2000;
         const span = l.end - l.start;
         if (span > 1e-9) {
           const dx = span / n;
@@ -218,7 +217,7 @@
     return { forces, moments };
   }
 
- function computeDiagram(L, forces, moments, N = 480) {
+ function computeDiagram(L, forces, moments, N = 2000) {
     const xs = new Array(N + 1), Vs = new Array(N + 1), Ms = new Array(N + 1);
     const EPS = 1e-7;
 
@@ -227,7 +226,6 @@
       let V = 0, M = 0;
       for (let k = 0; k < forces.length; k++) {
         if (forces[k].x <= x + EPS) {
-          // Prevent the final reaction at x = L from dropping V to 0
           if (forces[k].x < L - EPS) {
             V += forces[k].F;
           }
