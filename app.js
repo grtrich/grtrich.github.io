@@ -322,7 +322,6 @@
     const g = svgEl("g", {});
     svg.appendChild(g);
 
-    // Track vertical stacking for overlapping labels/arrows
     const stackTop = {};
     const stackBot = {};
     function getStack(x, isDown) {
@@ -398,7 +397,6 @@
     const y2 = down ? beamY - 8 - yOff : beamY + 8 + yOff;
     g.appendChild(svgEl("line", { x1: x, y1, x2: x, y2, stroke: color, "stroke-width": 2, "marker-end": marker }));
     
-    // label
     const textY = down ? y1 - 10 : y1 + 15;
     svgText(g, x, textY, fmt(Math.abs(magnitude)) + " " + state.forceUnit, { fill: color, "text-anchor": "middle" });
   }
@@ -414,7 +412,6 @@
       g.appendChild(svgEl("line", { x1: xx, y1: barY, x2: xx, y2: down ? beamY - 8 : beamY + 8, stroke: color, "stroke-width": 2, "marker-end": marker }));
     }
     
-    // label
     const textY = down ? barY - 10 - yOff : barY + 20 + yOff;
     svgText(g, (x1 + x2) / 2, textY, fmt(Math.abs(magnitude)) + " " + state.forceUnit + "/" + state.lengthUnit, { fill: color, "text-anchor": "middle" });
   }
@@ -490,7 +487,6 @@
     
     svgText(g, marginL - 60, marginT - 15, `${opts.title} (${opts.unit})`, { "font-weight": "bold" });
     
-    // Moved length label to the bottom right of the graph to match x-axis ticks
     svgText(g, W - marginR + 10, marginT + plotH + 20, `x (${state.lengthUnit})`, { "font-style": "italic", fill: "#555" });
 
     let linePath = `M ${sx(xs[0])} ${sy(ys[0])}`;
